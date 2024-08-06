@@ -2,9 +2,10 @@
 
 import "../../app/page.module.css"
 import { useState, useEffect, use, Suspense } from 'react'
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 import { Box, Container, FormControl, Grid, Typography, Input, Button, FormLabel } from '@mui/material';
 import IngredientCard from '../components/IngredientCard';
+import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   doc,
@@ -18,6 +19,7 @@ import {
 import SearchBar from "../components/SearchBar";
 
 export default function IngredientList() {
+  const [uid, setUid] = useState();
   const [inventory, setInventory] = useState([])
   const [newItem, setNewItem] = useState({
     name: null,
@@ -28,23 +30,47 @@ export default function IngredientList() {
   });
 
   useEffect(() => {
-    updateIngredients();
+    fetchUser()
   }, [])
 
+  useEffect(() => {
+    if (uid) {
+      console.log("UID: " + uid);
+      updateIngredients(uid);
+    }
+  }, [uid]);
+
+  const fetchUser = async () => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUid(user.uid)
+        console.log("UID: " + uid)
+        updateIngredients(user.uid);
+      } else {
+        console.log("not logged in")
+      }
+    });
+  }
+
   const updateIngredients = async () => {
-    const snapshot = query(collection(db, 'ingredients'))
-    const docs = await getDocs(snapshot)
-    const inventoryList = []
-    docs.forEach((doc) => {
-      inventoryList.push({ id: doc.id, ...doc.data() })
-    })
-    setInventory(inventoryList)
+    if (uid) {
+      const userRef = (doc(db, 'users', uid))
+      const ingredientRef = collection(userRef, "ingredients")
+      const ingredientSnap = await getDocs(ingredientRef)
+
+      const inventoryList = []
+      ingredientSnap.forEach((doc) => {
+        inventoryList.push({ id: doc.id, ...doc.data() })
+      })
+      setInventory(inventoryList)
+    }
   }
 
   const addIngredient = async (e) => {
     e.preventDefault();
+    const userRef = (doc(db, 'users', uid))
     if (newItem.name && newItem.quantity && newItem.price) {
-      await addDoc(collection(db, 'ingredients'), newItem);
+      await addDoc(collection(userRef, 'ingredients'), newItem);
     }
 
     setNewItem({
@@ -60,7 +86,7 @@ export default function IngredientList() {
 
   return (
     <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <SearchBar />
+      <SearchBar uid={uid} />
       <Typography variant="h4" sx={{ color: 'cyan' }}>Your Pantry</Typography>
       <Box className='ingredient-list' sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '32px' }}>
         <Box>

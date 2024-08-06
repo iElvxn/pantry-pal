@@ -1,18 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextField, Button, Container, Input, Box, Typography } from '@mui/material';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useRouter } from 'next/navigation'
 
-export default function SearchBar() {
+export default function SearchBar( {uid} ) {
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState([]);
 
+    useEffect(() => {
+        handleSearch();
+    },[searchQuery])
+
     const handleSearch = async () => {
-        if (searchQuery.trim() === '') return;
+        console.log(searchQuery)
+        if (searchQuery.trim() === '') {
+            setResults([]);
+            return;
+        }
+        const userRef = doc(db, "users", uid);
 
         const q = query(
-            collection(db, 'ingredients'),
+            collection(userRef, 'ingredients'),
             where('name', '>=', searchQuery),
             where('name', '<=', searchQuery + '\uf8ff') // Ensures we get all matches including those starting with searchQuery
         );
@@ -38,7 +47,7 @@ export default function SearchBar() {
                     label="Search Ingredients"
                     variant="outlined"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {setSearchQuery(e.target.value);}}
                     sx={{ marginBottom: '16px', color: 'black' }}
                 />
                 <Button variant="contained" onClick={handleSearch}>

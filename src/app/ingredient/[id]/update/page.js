@@ -4,9 +4,10 @@ import UpdateForm from "@/app/components/UpdateForm";
 import { redirect } from 'next/navigation'
 
 export default async function UpdateIngredient({ params }) {
-    const getData = async (id) => {
+    const getData = async (uid) => {
         "use server"
-        const docRef = doc(db, "ingredients", id);
+        const userRef = doc(db, "users", uid);
+        const docRef = doc(userRef, "ingredients", params.id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             // Document data
@@ -18,9 +19,11 @@ export default async function UpdateIngredient({ params }) {
         }
     }
 
-    const updateIngredient = async (updatedIngredient) => {
+    const updateIngredient = async (uid, updatedIngredient) => {
         "use server"
-        await setDoc(doc(db, "ingredients", params.id), {
+        const userRef = (doc(db, 'users', uid))
+        const docRef = doc(userRef, "ingredients", params.id)
+        await setDoc(docRef, {
             name: updatedIngredient.name,
             description: updatedIngredient.description,
             quantity: updatedIngredient.quantity,
@@ -30,9 +33,7 @@ export default async function UpdateIngredient({ params }) {
         redirect(`/ingredient/${params.id}`)
     }
 
-        const data = await getData(params.id);
-
         return (
-            <UpdateForm data={data} updateIngredient={updateIngredient} />
+            <UpdateForm getData={getData} updateIngredient={ updateIngredient} />
         );
     }
