@@ -1,8 +1,9 @@
-// app/layout.js
 import theme from "./theme";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Box, Typography, ThemeProvider } from "@mui/material";
+import { AuthProvider, useAuth } from "./components/AuthProvider";
+import Navigation from "./components/Navigation";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -14,29 +15,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <ThemeProvider theme={theme}>
-        <body className={inter.className}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', p: '16px' }}>
-            <a className="navbar-brand" href="/">
-              <Typography className="purple-text" sx={{fontSize: {xs: '20px', sm: '24px'}}}>PalPantry</Typography>
-            </a>
-            <span className="navbar-toggler-icon"></span>
-            <div>
-              <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '16px' }}>
-                <Typography className="nav-item active" sx={{fontSize: {xs: '20px', sm: '24px'}}}>
-                  <a className="nav-link yellow-text" href="/ingredient">Ingredients</a>
-                </Typography>
-                <Typography className="nav-item" sx={{fontSize: {xs: '20px', sm: '24px'}}}>
-                  <a className="nav-link red-text" href="/category">Categories</a>
-                </Typography>
-              </Box>
-            </div>
-          </Box>
-
-          <main>
-            {children}
-          </main>
-        </body>
+        <AuthProvider>
+          <body className={inter.className}>
+            <Navigation/>
+            <main>
+              {children}
+            </main>
+          </body>
+        </AuthProvider>
       </ThemeProvider>
     </html>
   );
 }
+
+
+

@@ -37,7 +37,7 @@ const getUser = () => {
 }
 
 
-export { db, getUser };
+export { app, db, getUser };
 export const auth = getAuth();
 
 

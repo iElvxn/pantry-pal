@@ -5,6 +5,7 @@ import { useState, useEffect, use, Suspense } from 'react'
 import { db, auth } from '../firebase';
 import { Box, Container, FormControl, Grid, Typography, Input, Button, FormLabel } from '@mui/material';
 import IngredientCard from '../components/IngredientCard';
+import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
@@ -19,6 +20,7 @@ import {
 import SearchBar from "../components/SearchBar";
 
 export default function IngredientList() {
+  const router = useRouter();
   const [uid, setUid] = useState();
   const [inventory, setInventory] = useState([])
   const [newItem, setNewItem] = useState({
@@ -26,7 +28,7 @@ export default function IngredientList() {
     description: null,
     quantity: 0,
     price: 0,
-    img: "https://pusheen.com/wp-content/uploads/2020/12/What-Sweet-Quiz-SocialResults_Donut-1-e1608220861325.jpg",
+    img: "",
   });
 
   useEffect(() => {
@@ -85,13 +87,13 @@ export default function IngredientList() {
   }
 
   return (
-    <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <SearchBar uid={uid} />
       <Typography variant="h4" sx={{ color: 'cyan' }}>Your Pantry</Typography>
       <Box className='ingredient-list' sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '32px' }}>
-        <Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px'}}>
           <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: "200px"}}>
               <FormLabel sx={{ color: "cyan" }}>Name: </FormLabel>
               <Input type='text' placeholder='Name of Ingredient' name='name' required onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}></Input>
             </Box>
@@ -114,12 +116,13 @@ export default function IngredientList() {
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Button type='submit' onClick={addIngredient}>Submit</Button>
             </Box>
+            <Button sx={{color: 'yellow'}} onClick={() => router.push('/camera')}>Use Camera</Button>
           </FormControl>
         </Box>
         <Suspense>
-          <Grid container spacing={2}>
+          <Grid container spacing={2} sx={{display: 'flex', justifyContent: { xs: 'center', md: 'normal'}} }>
             {inventory.map((ingredient) => (
-              <Grid item key={ingredient.id} xs={12} sm={6} md={4} sx={{ textTransform: 'none', display: 'flex', justifyContent: 'center' }}>
+              <Grid item key={ingredient.id} xs={8} sm={6} md={4} sx={{ textTransform: 'none', display: 'flex', justifyContent: 'center' }}>
                 <IngredientCard ingredient={ingredient} />
               </Grid>
             ))}

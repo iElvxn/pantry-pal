@@ -4,10 +4,12 @@ import { FormControl, Box, Container, Typography, Input, Button, FormLabel, colo
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { setDoc, doc, addDoc, collection } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function Register({ data, updateIngredient }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -15,11 +17,11 @@ export default function Register({ data, updateIngredient }) {
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
                 const user = auth.currentUser;
-                console.log(user)
                 if (user) {
                     await setDoc(doc(db, "users", user.uid), {
                         ingredients: [],
-                      });
+                    });
+                    router.push('/login');
                 }
             } catch (error) {
                 console.log(error.message);
