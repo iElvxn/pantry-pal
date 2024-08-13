@@ -10,6 +10,7 @@ import CameraAdd from "../components/CameraAdd";
 
 export default function PantryCamera() {
     const [image, setImage] = useState(null);
+    const [imgURL, setImgURL] = useState("");
     const [data, setData] = useState(null);
     const url = useRef();
 
@@ -22,6 +23,12 @@ export default function PantryCamera() {
             uploadToFirebase(blob);
         }
     }, [image]);
+
+    useEffect(() => {
+        if (imgURL) {
+            getDataFromURL(imgURL);
+        }
+    }, [imgURL]);
 
     const dataURItoBlob = (dataURI) => {
         if (dataURI) {
@@ -46,11 +53,17 @@ export default function PantryCamera() {
         setData(json);
     };
 
+    const getDataFromURL = async(imgURL) => {
+        const json = await openAI(imgURL);
+        console.log(json)
+        setData(json);
+    }
+
     return (
         <Container> 
             
             {!data ?
-                <CameraBtn image={image} setImage={setImage} />
+                <CameraBtn image={image} setImage={setImage} imgURL={imgURL} setImgURL={setImgURL}/>
                 :
                 <CameraAdd data={data} />
             }

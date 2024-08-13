@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore'
 import { db } from "./firebase";
 import { Container, Typography, Box } from "@mui/material";
+import ChatBox from "./components/ChatBox";
 
 export default function Home() {
   const [uid, setUid] = useState();
@@ -46,8 +47,12 @@ export default function Home() {
   return (
     <Container>
       <Box sx={{ width: "100%", display: "flex", justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-        <Typography variant="h4" sx={{color: 'cyan'}}>Status</Typography>
-        <Typography variant="h5" sx={{color: '#39FF14', display: 'flex', flexDirection: 'row', gap: '8px'}}>Count: <Typography variant="h5" sx={{color: 'white'}}> {count}</Typography></Typography>
+        <Typography variant="h4" sx={{ color: 'cyan' }}>Status</Typography>
+        <Box sx={{ color: '#39FF14', display: 'flex', flexDirection: 'row', gap: '8px' }}>
+          <Typography variant="h5" >Count: </Typography>
+          <Typography variant="h5" sx={{ color: 'white' }}> {count}</Typography>
+        </Box>
+        <ChatBox/>
       </Box>
     </Container>
   );
